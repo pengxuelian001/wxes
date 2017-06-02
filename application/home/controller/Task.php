@@ -1,34 +1,27 @@
 <?php
 namespace app\home\controller;
 use think\Controller;
-use app\home\model\Customers;
 use think\Db;
 use think\Cache;
-class Customer extends Controller
+class Task extends Controller
 {
-    public function add_Customer(){
+    public function add_Task(){
         $read = $this->checkRequestData();
-       // print_r($read['scale']);die();
-        if (is_null($read['scale']) || empty($read['scale'])) {
+        if (is_null($read['principal']) || empty($read['principal'])) {
             $res['success'] = false;
-            $res['message'] = "Empty scale";
+            $res['message'] = "Empty principal";
             return json ($res);
 
-        }elseif(is_null($read['charger']) || empty($read['charger'])){
+        }elseif(is_null($read['customer_id']) || empty($read['customer_id'])){
             $res['success'] = false;
-            $res['message'] = "Empty remark";
+            $res['message'] = "Empty customer_id";
             return json ($res);
-        }elseif(is_null($read['company']) || empty($read['company'])){
+        }elseif(is_null($read['participants']) || empty($read['participants'])){
             $res['success'] = false;
-            $res['message'] = "Empty company";
-            return json ($res);
-        }elseif(is_null($read['followUper']) || empty($read['followUper'])){
-            $res['success'] = false;
-            $res['message'] = "Empty followUper";
+            $res['message'] = "Empty recipients";
             return json ($res);
         }
-        $Customer =new Customers();
-         $result=$Customer->add_list($read);
+        $result=Db::name('task')->insert($read);
         if($result){
             $res['success'] = true;
             $res['message'] = "success";
@@ -37,23 +30,21 @@ class Customer extends Controller
 
 
     }
-    public function select_Customerlist(){
-        $resu=Cache::get('resu');
-        if(empty($resu)){
-            $Customer =new Customers();
-            $resu=$Customer->select_table();
-            Cache::set('resu',$resu,3600);
-         return  json_encode($resu);
+    public function select_TaskList(){
+        $cache=Cache::get('cache');
+        if(empty($cache)){
+            $cache=Db::name('task')->select();
+            Cache::set('cache',$cache,3600);
+            return  json_encode($cache);
         }else{
-            return  json_encode($resu);
-            Cache::rm('resu');
+            return  json_encode($cache);
+            Cache::rm('cache');
         }
-
     }
-    public function del_Customer(){
+    public function del_Task(){
         $read = $this->checkRequestData();
         $id=$read['id'];
-        $result=Db::name('customer_info')->where('Id',$id)->delete();
+        $result=Db::name('task')->where('Id',$id)->delete();
         if($result){
             $res['success'] = true;
             $res['message'] = "success";
@@ -85,6 +76,4 @@ class Customer extends Controller
         }
         return $read;
     }
-
-
 }

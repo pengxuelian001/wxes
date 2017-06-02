@@ -1,0 +1,11 @@
+[
+    {
+        "company": 11,
+        "charger": 11,
+        "scale": 11,
+        "position": 11,
+        "remark": 11,
+        "schedule": 11,
+        "followUper": 11
+    }
+]
