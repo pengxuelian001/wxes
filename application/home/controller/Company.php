@@ -35,16 +35,14 @@ class Company extends Controller
         if (empty($json)) {
             $res['success'] = false;
             $res['message'] = 'Empty RequestData';
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
         }
 
         $read = json_decode($json,true);
         if (is_null($read)) {
             $res['success'] = false;
             $res['message'] = "json_decode_error";
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
         }
         return $read;
     }

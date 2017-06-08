@@ -21,8 +21,10 @@ class Task extends Controller
             $res['message'] = "Empty recipients";
             return json ($res);
         }
+        $read['create_time']=date("Y-m-d");
         $result=Db::name('task')->insert($read);
         if($result){
+            Cache::rm('reports');
             $res['success'] = true;
             $res['message'] = "success";
             return json ($res);
@@ -31,29 +33,114 @@ class Task extends Controller
 
     }
     public function select_TaskList(){
-        $cache=Cache::get('cache');
-        if(empty($cache)){
-            $cache=Db::name('task')->select();
-            Cache::set('cache',$cache,3600);
-            return  json_encode($cache);
-        }else{
-            return  json_encode($cache);
-            Cache::rm('cache');
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods:get');
+        $openid=$_GET['open_id'];
+        $start_time=$_GET['start_time'];
+        $str='%Y-%m-%d';
+        $value3=$this->searchAsDays($str,$openid,$start_time);
+        return  json_encode($value3);
+      }
+
+
+
+
+
+
+
+    public function searchAsDays($str,$openid,$start_time)
+    {
+        $ye=  explode('-', $start_time)[0];
+        $me=  explode('-', $start_time)[1];
+        //每个月得最后一天
+        $var = date("t",strtotime($start_time));
+        for($d=1;$d<=$var;$d++){
+            $time = $ye.'-'.$me.'-'.$d;
+            $rel=Db::query("select * from rl_task where openid='$openid' and
+                                            date_format('$time','$str')>=date_format(create_time, '$str')and
+                                            date_format('$time','$str')<=date_format(create_time, '$str')
+                         ");
+
+            if($rel){
+                foreach($rel as $k=>$v){
+                    $result[$d-1][$k]['create_time']=$ye.'-'.$me.'-'.$d;
+                    $result[$d-1][$k]['theme']= $rel[$k]['theme'];
+                    $result[$d-1][$k]['openid']= $rel[$k]['openid'];
+                    $result[$d-1][$k]['done']= $rel[$k]['done'];
+                    $result[$d-1][$k]['customer_id']= $rel[$k]['customer_id'];
+                    $result[$d-1][$k]['principal']= $rel[$k]['principal'];
+                    $result[$d-1][$k]['participants']= $rel[$k]['participants'];
+                    $result[$d-1][$k]['importance']= $rel[$k]['importance'];
+                    $result[$d-1][$k]['depict']= $rel[$k]['depict'];
+                }
+            }
+            else{
+                $result[$d-1]['create_time']=$ye.'-'.$me.'-'.$d;
+                $result[$d-1]['theme']=null;
+                $result[$d-1]['openid']=null;
+                $result[$d-1]['done']= null;
+                $result[$d-1]['customer_id']= null;
+                $result[$d-1]['principal']= null;
+                $result[$d-1]['participants']= null;
+                $result[$d-1]['importance']= null;
+                $result[$d-1]['depict']= null;
+            }
         }
+
+        return($result);
+
+
+
+
     }
-    public function del_Task(){
-        $read = $this->checkRequestData();
-        $id=$read['id'];
-        $result=Db::name('task')->where('Id',$id)->delete();
-        if($result){
-            $res['success'] = true;
-            $res['message'] = "success";
-            return json ($res);
+    public function getTask(){
+        $day=date("Y-m-d");
+        $openid=$_GET['open_id'];
+        $arr=Db::name('task')->where("openid='$openid' and create_time='$day'")->select();
+        if($arr){
+            return  json_encode($arr);
         }else{
             $res['success'] = false;
-            $res['message'] = "delete error";
+            $res['message'] = "null";
             return json ($res);
         }
+
+    }
+    public function dealTask(){
+        $read = $this->checkRequestData();
+        $id=$read['taskId'];
+        $tpye=$read['type'];
+        $delayTime=$read['delayTime'];
+        $openid=$read['openId'];
+        if($tpye==1){
+            $data['update_time']=$delayTime;
+            $data['done']=1;
+            $result=Db::name('task')->where('Id',$id)->update($data);
+            if($result){
+                Cache::rm('reports');
+                $res['success'] = true;
+                $res['message'] = "update success";
+                return json ($res);
+            }else{
+
+                $res['success'] = false;
+                $res['message'] = "update error";
+                return json ($res);
+            }
+        }elseif($tpye==3){
+            $result=Db::name('task')->where('Id',$id)->delete();
+            if($result){
+                Cache::rm('reports');
+                $res['success'] = true;
+                $res['message'] = "delete success";
+                return json ($res);
+            }else{
+                $res['success'] = false;
+                $res['message'] = "delete error";
+                return json ($res);
+            }
+        }
+
     }
     private function checkRequestData()
     {
@@ -63,16 +150,14 @@ class Task extends Controller
         if (empty($json)) {
             $res['success'] = false;
             $res['message'] = 'Empty RequestData';
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
         }
 
         $read = json_decode($json,true);
         if (is_null($read)) {
             $res['success'] = false;
             $res['message'] = "json_decode_error";
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
         }
         return $read;
     }

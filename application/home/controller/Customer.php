@@ -8,7 +8,7 @@ class Customer extends Controller
 {
     public function add_Customer(){
         $read = $this->checkRequestData();
-       // print_r($read['scale']);die();
+
         if (is_null($read['scale']) || empty($read['scale'])) {
             $res['success'] = false;
             $res['message'] = "Empty scale";
@@ -30,6 +30,7 @@ class Customer extends Controller
         $Customer =new Customers();
          $result=$Customer->add_list($read);
         if($result){
+            Cache::rm('resu');
             $res['success'] = true;
             $res['message'] = "success";
             return json ($res);
@@ -40,13 +41,11 @@ class Customer extends Controller
     public function select_Customerlist(){
         $resu=Cache::get('resu');
         if(empty($resu)){
-            $Customer =new Customers();
-            $resu=$Customer->select_table();
+            $resu=Db::name('customer_info')->select();
             Cache::set('resu',$resu,3600);
          return  json_encode($resu);
         }else{
             return  json_encode($resu);
-            Cache::rm('resu');
         }
 
     }
@@ -55,6 +54,7 @@ class Customer extends Controller
         $id=$read['id'];
         $result=Db::name('customer_info')->where('Id',$id)->delete();
         if($result){
+            Cache::rm('resu');
             $res['success'] = true;
             $res['message'] = "success";
             return json ($res);
@@ -72,16 +72,16 @@ class Customer extends Controller
         if (empty($json)) {
             $res['success'] = false;
             $res['message'] = 'Empty RequestData';
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
+
         }
 
         $read = json_decode($json,true);
         if (is_null($read)) {
             $res['success'] = false;
             $res['message'] = "json_decode_error";
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
+
         }
         return $read;
     }

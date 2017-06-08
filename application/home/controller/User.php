@@ -6,13 +6,12 @@ use app\home\model\Users;
 use think\Db;
 use think\Cache;
 use think\Loader;
-use think\Request;
 
 class User extends Controller
 {
-    public function add_Users()
-    {
+    public function add_Users(){
         $read = $this->checkRequestData();
+
         $openid=$read["userInfo_openid"]["openid"];
 
        foreach($read as $userInfo => $oneObj) {
@@ -33,25 +32,26 @@ class User extends Controller
            }
 
         }else{
-           $users =new Users();
-           $result=$users->add_list($data);
+           $result=Db::name('user')->insert($data);
            if($result){
+               Cache::rm('users');
                $res['success'] = true;
                $res['message'] = "success";
+               return json ($res);
            }
-           return json ($res);
+
 
        }
     }
 
     public function select_UsersList(){
-        $lists=Cache::get('lists');
-        if(empty($lists)){
-            $lists=Db::table('rl_user')->select();
-            Cache::set('lists',$lists,10);
-            return  json_encode($lists);
+        $user=Cache::get('users');
+        if(empty($user)){
+            $value1=Db::name('user')->select();
+            Cache::set('users',$value1,3600);
+            return  json_encode($value1);
         }else{
-            return  json_encode($lists);
+            return  json_encode($user);
         }
     }
     public  function del_Users(){
@@ -139,20 +139,19 @@ class User extends Controller
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods:post');
         $json = file_get_contents("php://input");
+
         if (empty($json)) {
             $res['success'] = false;
             $res['message'] = 'Empty RequestData';
-            $this->response($res, 'json');
-            return null;
+            return json ($res,'json');
         }
-
         $read = json_decode($json,true);
         if (is_null($read)) {
             $res['success'] = false;
             $res['message'] = "json_decode_error";
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
         }
+
         return $read;
     }
 

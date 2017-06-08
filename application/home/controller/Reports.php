@@ -24,6 +24,7 @@ class Reports extends Controller
         }
         $result=Db::name('reports')->insert($read);
         if($result){
+            Cache::rm('reports');
             $res['success'] = true;
             $res['message'] = "success";
             return json ($res);
@@ -32,14 +33,14 @@ class Reports extends Controller
 
     }
     public function select_ReportsList(){
-        $arr=Cache::get('arr');
+
+        $arr=Cache::get('reports');
         if(empty($arr)){
-            $arr=Db::name('reports')->select();
-            Cache::set('arr',$arr,3600);
-            return  json_encode($arr);
+            $value3=Db::name('reports')->select();
+            Cache::set('reports',$value3,3600);
+            return  json_encode($value3);
         }else{
             return  json_encode($arr);
-            Cache::rm('arr');
         }
     }
    public function del_Reports(){
@@ -47,6 +48,7 @@ class Reports extends Controller
        $id=$read['id'];
        $result=Db::name('reports')->where('Id',$id)->delete();
        if($result){
+           Cache::rm('reports');
            $res['success'] = true;
            $res['message'] = "success";
            return json ($res);
@@ -64,16 +66,14 @@ class Reports extends Controller
         if (empty($json)) {
             $res['success'] = false;
             $res['message'] = 'Empty RequestData';
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
         }
 
         $read = json_decode($json,true);
         if (is_null($read)) {
             $res['success'] = false;
             $res['message'] = "json_decode_error";
-            $this->response($res, 'json');
-            return null;
+            return json ($res);
         }
         return $read;
     }
