@@ -24,7 +24,7 @@ class Task extends Controller
         $read['create_time']=date("Y-m-d");
         $result=Db::name('task')->insert($read);
         if($result){
-            Cache::rm('reports');
+           // Cache::rm($where);
             $res['success'] = true;
             $res['message'] = "success";
             return json ($res);
@@ -38,21 +38,8 @@ class Task extends Controller
         $openid=$_GET['open_id'];
         $start_time=$_GET['start_time'];
         $str='%Y-%m-%d';
-        $value3=$this->searchAsDays($str,$openid,$start_time);
-        return  json_encode($value3);
-      }
-
-
-
-
-
-
-
-    public function searchAsDays($str,$openid,$start_time)
-    {
         $ye=  explode('-', $start_time)[0];
         $me=  explode('-', $start_time)[1];
-        //每个月得最后一天
         $var = date("t",strtotime($start_time));
         for($d=1;$d<=$var;$d++){
             $time = $ye.'-'.$me.'-'.$d;
@@ -85,14 +72,66 @@ class Task extends Controller
                 $result[$d-1]['importance']= null;
                 $result[$d-1]['depict']= null;
             }
+
         }
 
-        return($result);
-
-
-
-
+        return  json_encode($result);
     }
+//    public function select_cache(){
+//        header('Access-Control-Allow-Origin: *');
+//        header('Access-Control-Allow-Methods:get');
+//        $openid=$_GET['open_id'];
+//        $start_time=$_GET['start_time'];
+//        $str='%Y-%m-%d';
+//        $ye=  explode('-', $start_time)[0];
+//        $me=  explode('-', $start_time)[1];
+//        $var = date("t",strtotime($start_time));
+//        for($d=1;$d<=$var;$d++){
+//            $time = $ye.'-'.$me.'-'.$d;
+//            $sql="SELECT * FROM rl_task WHERE ";
+//
+//                $where = "openid='$openid'
+//                                           and date_format('$time','$str')>=date_format(create_time, '$str')and
+//                                           date_format('$time','$str')<=date_format(create_time, '$str')";
+//                $a = $sql . $where;
+//
+//                $rel=Cache::get($where);
+//                if ($rel == false) {
+//                    $result=Db::query($a);
+//                    Cache::set($where,$result,3600);
+//
+//                }
+//                if($rel){
+//                    foreach($rel as $k=>$v){
+//                        $result[$d-1][$k]['create_time']=$ye.'-'.$me.'-'.$d;
+//                        $result[$d-1][$k]['theme']= $rel[$k]['theme'];
+//                        $result[$d-1][$k]['openid']= $rel[$k]['openid'];
+//                        $result[$d-1][$k]['done']= $rel[$k]['done'];
+//                        $result[$d-1][$k]['customer_id']= $rel[$k]['customer_id'];
+//                        $result[$d-1][$k]['principal']= $rel[$k]['principal'];
+//                        $result[$d-1][$k]['participants']= $rel[$k]['participants'];
+//                        $result[$d-1][$k]['importance']= $rel[$k]['importance'];
+//                        $result[$d-1][$k]['depict']= $rel[$k]['depict'];
+//                    }
+//                }
+//                else{
+//                    $result[$d-1]['create_time']=$ye.'-'.$me.'-'.$d;
+//                    $result[$d-1]['theme']=null;
+//                    $result[$d-1]['openid']=null;
+//                    $result[$d-1]['done']= null;
+//                    $result[$d-1]['customer_id']= null;
+//                    $result[$d-1]['principal']= null;
+//                    $result[$d-1]['participants']= null;
+//                    $result[$d-1]['importance']= null;
+//                    $result[$d-1]['depict']= null;
+//                }
+//            echo json_encode($result);
+//
+//
+//        }
+//
+//
+//    }
     public function getTask(){
         $day=date("Y-m-d");
         $openid=$_GET['open_id'];
@@ -117,7 +156,7 @@ class Task extends Controller
             $data['done']=1;
             $result=Db::name('task')->where('Id',$id)->update($data);
             if($result){
-                Cache::rm('reports');
+              //  Cache::rm($where);
                 $res['success'] = true;
                 $res['message'] = "update success";
                 return json ($res);
@@ -130,7 +169,7 @@ class Task extends Controller
         }elseif($tpye==3){
             $result=Db::name('task')->where('Id',$id)->delete();
             if($result){
-                Cache::rm('reports');
+              //  Cache::rm('reports');
                 $res['success'] = true;
                 $res['message'] = "delete success";
                 return json ($res);
@@ -161,4 +200,5 @@ class Task extends Controller
         }
         return $read;
     }
+
 }

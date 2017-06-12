@@ -40,8 +40,10 @@ class Reports extends Controller
             Cache::set('reports',$value3,3600);
             return  json_encode($value3);
         }else{
+            Cache::rm('reports');
             return  json_encode($arr);
         }
+
     }
    public function del_Reports(){
        $read = $this->checkRequestData();
