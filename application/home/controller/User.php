@@ -43,6 +43,11 @@ class User extends Controller
 
        }
     }
+    public function All(){
+        $res['success'] = true;
+        $res['message'] = "success";
+        return json ($res);
+    }
 
     public function select_UsersList(){
         $user=Cache::get('users');
@@ -59,6 +64,7 @@ class User extends Controller
         $openid=$read['openid'];
         $result=Db::name('user')->where('openid',$openid)->delete();
         if($result){
+            Cache::rm('users');
             $res['success'] = true;
             $res['message'] = "success";
             return json ($res);
@@ -69,12 +75,12 @@ class User extends Controller
         }
     }
     public function upload(){
-        $file = request()->file('import');
-
-        $info = $file->validate(['size'=>15678,'ext'=>'xlsx,xls'])->move(ROOT_PATH . 'public' . DS . 'uploads');
+        $file = request()->file('file');
+        print_R($file);die();
+        $info = $file->validate(['size'=>15678,'ext'=>'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads');
         $filename = $file -> getInfo()['name'];
         if($info){
-            $prj=$this->set_Excel($info);
+            //$prj=$this->set_Excel($info);
         }else{
 
             echo $file->getError();
@@ -160,6 +166,24 @@ class User extends Controller
         //print_r($json);die();
         $jsonstr = (json_encode($json));
         print_r($jsonstr);
+    }
+    public function index(){
+        if(!empty($_FILES['file'])){
+            //获取扩展名
+            $exename  = $this->getExeName($_FILES['file']['name']);
+            if($exename != 'png' && $exename != 'jpg' && $exename != 'gif'){
+                exit('不允许的扩展名');
+            }
+            $imageSavePath = uniqid().'.'.$exename;
+            if(move_uploaded_file($_FILES['file']['tmp_name'], $imageSavePath)){
+                echo $imageSavePath;
+            }
+        }
+    }
+
+    public function getExeName($fileName){
+        $pathinfo      = pathinfo($fileName);
+        return strtolower($pathinfo['extension']);
     }
 
 
