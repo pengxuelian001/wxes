@@ -7,6 +7,7 @@ class Company extends Controller
 {
     public function add_Company(){
         $read = $this->checkRequestData();
+
         $name=$read['name'];
         if (is_null($name) || empty($name)) {
             $res['success'] = false;
@@ -32,6 +33,8 @@ class Company extends Controller
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods:post');
         $json = file_get_contents("php://input");
+       // print_R($json);die();
+        file_put_contents("test.txt", $json);
         if (empty($json)) {
             $res['success'] = false;
             $res['message'] = 'Empty RequestData';

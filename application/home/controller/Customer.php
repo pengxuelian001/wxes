@@ -41,13 +41,14 @@ class Customer extends Controller
     public function select_Customerlist(){
         $resu=Cache::get('resu');
         if(empty($resu)){
-            $resu=Db::name('customer_info')->select();
+            $cus_table= new Customers();
+            $resu=$cus_table->CustomerList();
             Cache::set('resu',$resu,3600);
-         return  json_encode($resu);
+            return  json_encode($resu);
         }else{
+
             return  json_encode($resu);
         }
-
     }
     public function del_Customer(){
         $read = $this->checkRequestData();
@@ -63,6 +64,33 @@ class Customer extends Controller
             $res['message'] = "delete error";
             return json ($res);
         }
+
+    }
+    public function  postUpdateCustomer(){
+       $read = $this->checkRequestData();
+        $id=$read['id'];
+        $data['company']=$read['company'];
+        $data['charger']=$read['charger'];
+        $data['remark']=$read['remark'];
+        $data['position']=$read['position'];
+        $data['followUper']=$read['followUper'];
+        $data['schedule']=$read['schedule'];
+        $data['scale']=$read['scale'];
+
+        $result=Db::name('customer_info')->where('Id',$id)->find();
+        if($result){
+            $re=Db::name('customer_info')->where('Id',$id)->update($data);
+            if($re){
+                $res['success'] = true;
+                $res['message'] = "success";
+                return json ($res);
+            }
+        }else{
+            $res['success'] = false;
+            $res['message'] = " error";
+            return json ($res);
+        }
+
     }
     private function checkRequestData()
     {

@@ -11,8 +11,8 @@ class User extends Controller
 {
     public function add_Users(){
         $read = $this->checkRequestData();
-
         $openid=$read["userInfo_openid"]["openid"];
+
 
        foreach($read as $userInfo => $oneObj) {
             foreach ($oneObj as $key => $value) {
@@ -43,10 +43,14 @@ class User extends Controller
 
        }
     }
-    public function All(){
-        $res['success'] = true;
-        $res['message'] = "success";
-        return json ($res);
+    public function Group_Reports(){
+        $user_table= new Users();
+        $result=$user_table->Group_Report();
+        foreach($result as $k=>$v){
+            $group_id=$result[$k]['id'];
+            $result[$k]['data']= Db::query("SELECT * FROM rl_user where UserGroup='$group_id'");
+        }
+        return json ($result);
     }
 
     public function select_UsersList(){
@@ -78,6 +82,7 @@ class User extends Controller
         $file = request()->file('file');
         print_R($file);die();
         $info = $file->validate(['size'=>15678,'ext'=>'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads');
+
         $filename = $file -> getInfo()['name'];
         if($info){
             //$prj=$this->set_Excel($info);
@@ -85,8 +90,9 @@ class User extends Controller
 
             echo $file->getError();
         }
-
     }
+
+
     public  function  set_Excel($info){
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods:get');
@@ -145,6 +151,8 @@ class User extends Controller
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods:post');
         $json = file_get_contents("php://input");
+
+        file_put_contents("test.txt", $json);
 
         if (empty($json)) {
             $res['success'] = false;

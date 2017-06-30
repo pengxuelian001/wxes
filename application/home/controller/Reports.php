@@ -1,42 +1,42 @@
 <?php
 namespace app\home\controller;
 use think\Controller;
-use app\home\model\Customers;
+use app\home\model\report;
 use think\Db;
 use think\Cache;
 class Reports extends Controller
 {
-    public function add_Reports(){
-        $read = $this->checkRequestData();
-        if (is_null($read['openid']) || empty($read['openid'])) {
-            $res['success'] = false;
-            $res['message'] = "Empty openid";
-            return json ($res);
-
-        }elseif(is_null($read['sender']) || empty($read['sender'])){
-            $res['success'] = false;
-            $res['message'] = "Empty sender";
-            return json ($res);
-        }elseif(is_null($read['recipients']) || empty($read['recipients'])){
-            $res['success'] = false;
-            $res['message'] = "Empty recipients";
-            return json ($res);
-        }
-        $result=Db::name('reports')->insert($read);
-        if($result){
-            Cache::rm('reports');
-            $res['success'] = true;
-            $res['message'] = "success";
-            return json ($res);
-        }
-
+    public function upload(){
+        $arr= $this->request->param();
+        $data['openid']=$arr['openid'];
+        $data['title']=$arr['title'];
+        $data['copy']=$arr['copy'];
+        $data['recipients']=$arr['recipients'];
+        $data['position']=$arr['position'];
+        $id=Db::name('reports')->insertGetId($data);
+        $file = request()->file('file');
+        $info = $file->rule('uniqid')->move(APP_PATH . 'public' . DS . 'uploads'. DS .$id);
+            if($info){
+               // $exclePath = $info->getSaveName();  //获取文件名
+              //  $filename = ROOT_PATH . 'public' . DS . 'uploads' . DS . $exclePath;
+                $res['success'] = true;
+                $res['message'] = "success";
+            }
+    }
+    public function age(){
+        $data['username']='pp';
+        $data['password']=md5('123');
+        $data['age']=12;
+        $data['sex']=0;
+        $result=Db::connect('db2')->table('user')->insert($data);
+        print_R($result);
 
     }
     public function select_ReportsList(){
-
         $arr=Cache::get('reports');
         if(empty($arr)){
-            $value3=Db::name('reports')->select();
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist();
             Cache::set('reports',$value3,3600);
             return  json_encode($value3);
         }else{
@@ -45,6 +45,7 @@ class Reports extends Controller
         }
 
     }
+
    public function del_Reports(){
        $read = $this->checkRequestData();
        $id=$read['id'];
@@ -65,6 +66,8 @@ class Reports extends Controller
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods:post');
         $json = file_get_contents("php://input");
+        file_put_contents("test.txt", $json);
+   // print_r($json);die();
         if (empty($json)) {
             $res['success'] = false;
             $res['message'] = 'Empty RequestData';

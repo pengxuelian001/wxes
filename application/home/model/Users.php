@@ -17,6 +17,10 @@ class Users extends Model
             $list = DB::table($this->table)->where('status',1)->paginate(5);
               return $list;
         }
+    public function Group_Report(){
+        $list= Db::query("SELECT id ,name FROM rl_department GROUP BY id");
+        return $list;
+    }
 }
         
        

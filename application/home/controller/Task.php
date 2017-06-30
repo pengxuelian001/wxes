@@ -2,6 +2,7 @@
 namespace app\home\controller;
 use think\Controller;
 use think\Db;
+use app\home\model\tasks;
 use think\Cache;
 class Task extends Controller
 {
@@ -35,106 +36,48 @@ class Task extends Controller
     public function select_TaskList(){
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods:get');
-        $openid=$_GET['open_id'];
-        $start_time=$_GET['start_time'];
+       $openid=$_GET['open_id'];
+       $start_time=$_GET['start_time'];
+        //$openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+       // $start_time='2017-06-07';
         $str='%Y-%m-%d';
         $ye=  explode('-', $start_time)[0];
         $me=  explode('-', $start_time)[1];
         $var = date("t",strtotime($start_time));
         for($d=1;$d<=$var;$d++){
             $time = $ye.'-'.$me.'-'.$d;
-            $rel=Db::query("select * from rl_task where openid='$openid' and
-                                            date_format('$time','$str')>=date_format(create_time, '$str')and
-                                            date_format('$time','$str')<=date_format(create_time, '$str')
-                         ");
-
+            $task_table=new tasks();
+            $rel=$task_table->select_TaskList($openid,$time,$str);
             if($rel){
+                $result[$d-1]['success']=true;
+                $result[$d-1]['create_time']=$ye.'-'.$me.'-'.$d;
                 foreach($rel as $k=>$v){
-                    $result[$d-1][$k]['create_time']=$ye.'-'.$me.'-'.$d;
-                    $result[$d-1][$k]['theme']= $rel[$k]['theme'];
-                    $result[$d-1][$k]['openid']= $rel[$k]['openid'];
-                    $result[$d-1][$k]['done']= $rel[$k]['done'];
-                    $result[$d-1][$k]['customer_id']= $rel[$k]['customer_id'];
-                    $result[$d-1][$k]['principal']= $rel[$k]['principal'];
-                    $result[$d-1][$k]['participants']= $rel[$k]['participants'];
-                    $result[$d-1][$k]['importance']= $rel[$k]['importance'];
-                    $result[$d-1][$k]['depict']= $rel[$k]['depict'];
+                    $result[$d-1]['data'][$k]['create_time']=$ye.'-'.$me.'-'.$d;
+                    $result[$d-1]['data'][$k]['taskid']= $rel[$k]['Id'];
+                    $result[$d-1]['data'][$k]['theme']= $rel[$k]['theme'];
+                    $result[$d-1]['data'][$k]['openid']= $rel[$k]['openid'];
+                    $result[$d-1]['data'][$k]['done']= $rel[$k]['done'];
+                    $result[$d-1]['data'][$k]['customer_id']= $rel[$k]['customer_id'];
+                    $result[$d-1]['data'][$k]['principal']= $rel[$k]['principal'];
+                    $result[$d-1]['data'][$k]['participants']= $rel[$k]['participants'];
+                    $result[$d-1]['data'][$k]['importance']= $rel[$k]['importance'];
+                    $result[$d-1]['data'][$k]['depict']= $rel[$k]['depict'];
                 }
             }
             else{
+                $result[$d-1]['success']=false;
                 $result[$d-1]['create_time']=$ye.'-'.$me.'-'.$d;
-                $result[$d-1]['theme']=null;
-                $result[$d-1]['openid']=null;
-                $result[$d-1]['done']= null;
-                $result[$d-1]['customer_id']= null;
-                $result[$d-1]['principal']= null;
-                $result[$d-1]['participants']= null;
-                $result[$d-1]['importance']= null;
-                $result[$d-1]['depict']= null;
+
             }
 
         }
 
         return  json_encode($result);
     }
-//    public function select_cache(){
-//        header('Access-Control-Allow-Origin: *');
-//        header('Access-Control-Allow-Methods:get');
-//        $openid=$_GET['open_id'];
-//        $start_time=$_GET['start_time'];
-//        $str='%Y-%m-%d';
-//        $ye=  explode('-', $start_time)[0];
-//        $me=  explode('-', $start_time)[1];
-//        $var = date("t",strtotime($start_time));
-//        for($d=1;$d<=$var;$d++){
-//            $time = $ye.'-'.$me.'-'.$d;
-//            $sql="SELECT * FROM rl_task WHERE ";
-//
-//                $where = "openid='$openid'
-//                                           and date_format('$time','$str')>=date_format(create_time, '$str')and
-//                                           date_format('$time','$str')<=date_format(create_time, '$str')";
-//                $a = $sql . $where;
-//
-//                $rel=Cache::get($where);
-//                if ($rel == false) {
-//                    $result=Db::query($a);
-//                    Cache::set($where,$result,3600);
-//
-//                }
-//                if($rel){
-//                    foreach($rel as $k=>$v){
-//                        $result[$d-1][$k]['create_time']=$ye.'-'.$me.'-'.$d;
-//                        $result[$d-1][$k]['theme']= $rel[$k]['theme'];
-//                        $result[$d-1][$k]['openid']= $rel[$k]['openid'];
-//                        $result[$d-1][$k]['done']= $rel[$k]['done'];
-//                        $result[$d-1][$k]['customer_id']= $rel[$k]['customer_id'];
-//                        $result[$d-1][$k]['principal']= $rel[$k]['principal'];
-//                        $result[$d-1][$k]['participants']= $rel[$k]['participants'];
-//                        $result[$d-1][$k]['importance']= $rel[$k]['importance'];
-//                        $result[$d-1][$k]['depict']= $rel[$k]['depict'];
-//                    }
-//                }
-//                else{
-//                    $result[$d-1]['create_time']=$ye.'-'.$me.'-'.$d;
-//                    $result[$d-1]['theme']=null;
-//                    $result[$d-1]['openid']=null;
-//                    $result[$d-1]['done']= null;
-//                    $result[$d-1]['customer_id']= null;
-//                    $result[$d-1]['principal']= null;
-//                    $result[$d-1]['participants']= null;
-//                    $result[$d-1]['importance']= null;
-//                    $result[$d-1]['depict']= null;
-//                }
-//            echo json_encode($result);
-//
-//
-//        }
-//
-//
-//    }
     public function getTask(){
         $day=date("Y-m-d");
-        $openid=$_GET['open_id'];
+       $openid=$_GET['open_id'];
+       // $openid='oCx4a0aan7yxESfMMBKmYMA_8M0';
         $arr=Db::name('task')->where("openid='$openid' and create_time='$day'")->select();
         if($arr){
             return  json_encode($arr);
