@@ -10,34 +10,48 @@ class Reports extends Controller
         $read = $this->checkRequestData();
         $img=$read['imgList'];
         foreach($img as $v){
-           $dat[]=$v;
-
+           $da[]=$v;
         }
-         $arr=implode(',',$dat);
-            $data['openid']=$read['openid'];
-            $data['title']=$read['title'];
-            $data['copy']=$read['copy'];
-            $data['recipients']=$read['recipients'];
-            $data['imgList']=$arr;
-            $data['position']=$read['position'];
-            $id=Db::name('reports')->insertGetId($data);
-            if($id){
-                $res['success'] = true;
-                $res['message'] = "success";
-                return json ($res);
+        $recive=$read['recive'];
+        foreach($recive as $k=>$vv){
+            $types=$recive[$k]['type'];
+            if($types==2){
+                $name[]=$recive[$k]['name'];
+            }elseif($types==1){
+                $reci[]=$recive[$k]['name'];
             }
+        }
+         $arr=implode(',',$da);
+        $data['openid']=$read['openid'];
+        $data['title']=$read['title'];
+        $data['copy']=implode(',',$name);
+        $data['recipients']=implode(',',$reci);
+        $data['imgList']=$arr;
+        $data['position']=$read['position'];
+        $data['content']=$read['content'];
+        $reciveData['reportId']=Db::name('reports')->insertGetId($data);
+        for($j=0;$j<count($recive);$j++){
+            $reciveData["reciveId"]=$recive[$j]['id'];
+            $reciveData["type"]=$recive[$j]['type'];
+            $resl= Db::name('reports_readed')->insertGetId($reciveData);
+        }
+        if($resl){
+            $res['success'] = true;
+            $res['message'] = "success";
+            return json ($res);
+        }
+
+
     }
     public  function upload(){
         $arr= $this->request->param();
         $openid=$arr['openid'];
         $file = request()->file('file');
-        $info = $file->move(APP_PATH . 'public' . DS . 'uploads'. DS ."$openid",'');
+        $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads'. DS ."$openid",'');
         if($info){
-             $exclePath = $info->getSaveName();  //获取文件名
-             $filename = ROOT_PATH . 'public' . DS . 'uploads' . DS . $exclePath;
-            print_R($filename);die();
-           // return json ($filename);
-          //  echo $info->getExtension();
+            $exclePath = $info->getSaveName();  //获取文件名
+            $filename = ROOT_PATH . 'public' . DS . 'uploads' . DS . $exclePath;
+            return json ($filename);
         }
     }
     public function age(){
@@ -50,41 +64,155 @@ class Reports extends Controller
 
     }
     public function select_ReportsList(){
-        $arr=Cache::get('reports');
-        if(empty($arr)){
+//        $type=3;
+//        $typeC=3;
+//        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+        $type=$_GET['type'];
+        $typeC=$_GET['typeC'];
+        $openid=$_GET['openid'];
+        if($type==1 && $typeC==1){
             $rep_table=new report();
-            $value3=$rep_table->selectRepostlist();
-            Cache::set('reports',$value3,3600);
-            return  json_encode($value3);
-        }else{
-            Cache::rm('reports');
-            return  json_encode($arr);
+            $value3=$rep_table->selectRepostlist11($openid);
+            return json ($value3);
+        }elseif($type==1 && $typeC==2){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist12($openid);
+            return json ($value3);
+        }elseif($type==1 && $typeC==3){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist13($openid);
+            return json ($value3);
+        }elseif($type==1 && $typeC==4){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist14($openid);
+            return json ($value3);
+        }elseif($type==2 && $typeC==1){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist21($openid);
+            return json ($value3);
+        }elseif($type==2 && $typeC==2){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist22($openid);
+            return json ($value3);
+        }elseif($type==2 && $typeC==3 ){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist23($openid);
+            return json ($value3);
+
+        }elseif($type==2 && $typeC==4){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist24($openid);
+            return json ($value3);
+        }elseif($type==3 && $typeC==1){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist31($openid);
+            return json ($value3);
+        }elseif($type==3 && $typeC==2){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist32($openid);
+            return json ($value3);
+        }elseif($type==3 && $typeC==3){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist33($openid);
+            return json ($value3);
+        }elseif($type==3 && $typeC==4){
+            $rep_table=new report();
+            $value3=$rep_table->selectRepostlist34($openid);
+            return json ($value3);
+        }
+
+
+    }
+    public function Create_text(){
+        $arr= $this->request->param();
+        $openid=$arr['openid'];
+        $type=$arr['type'];
+        $file = request()->file('file');
+        if($type==1){
+            $info = $file->move(ROOT_PATH . 'public' . DS . 'contracts','');
+            if($info){
+                $exclePath= $info->getSaveName();  //获取文件名
+                $filename = ROOT_PATH . 'public' . DS . 'products' . DS .$exclePath;
+                //$res['success'] = true;
+                //$res['message'] = "success";
+                return json ($filename);
+            }
+        }
+
+    }
+    public function select_file(){
+     // $type=2;
+       $type=$_GET['type'];
+        if($type==1){
+            $dir="C:/xampp/htdocs/wxes/public/contracts"; //路径
+            $handle=opendir($dir.".");
+            while (false !== ($file = readdir($handle)))
+            {
+                if ($file != "." && $file != "..") {
+                    //$data[]= $file .':'.$dir;
+                    $data[]=mb_convert_encoding($file,"utf-8","gb2312");
+                }
+            }
+            $arr['file']=$data;
+            $arr['path']=$dir;
+            closedir($handle);
+            return json ($arr);
+        }elseif($type==2){
+            $dir="C:/xampp/htdocs/wxes/public/products"; //路径
+            $handle=opendir($dir.".");
+            while (false !== ($file = readdir($handle)))
+            {
+                if ($file != "." && $file != "..") {
+                    //$data[]= $file .':'.$dir;
+                    $data[]=mb_convert_encoding($file,"utf-8","gb2312");
+                }
+            }
+            $arr['file']=$data;
+            $arr['path']=$dir;
+            closedir($handle);
+            return json ($arr);
+        }elseif($type==3) {
+            $dir="C:/xampp/htdocs/wxes/public/brochures"; //路径
+
+            $handle=opendir($dir.".");
+            while (false !== ($file = readdir($handle)))
+            {
+                if ($file != "." && $file != "..") {
+                   // $data[]= $file .':'.$dir;
+                    $data[]=mb_convert_encoding($file,"utf-8","gb2312");
+                }
+            }
+            $arr['file']=$data;
+            $arr['path']=$dir;
+            closedir($handle);
+            return json ($arr);
         }
 
     }
 
-   public function del_Reports(){
-       $read = $this->checkRequestData();
-       $id=$read['id'];
-       $result=Db::name('reports')->where('Id',$id)->delete();
-       if($result){
-           Cache::rm('reports');
-           $res['success'] = true;
-           $res['message'] = "success";
-           return json ($res);
-       }else{
-           $res['success'] = false;
-           $res['message'] = "delete error";
-           return json ($res);
-       }
-   }
+
+    public function del_Reports(){
+        $read = $this->checkRequestData();
+        $id=$read['id'];
+        $result=Db::name('reports')->where('Id',$id)->delete();
+        if($result){
+            Cache::rm('reports');
+            $res['success'] = true;
+            $res['message'] = "success";
+            return json ($res);
+        }else{
+            $res['success'] = false;
+            $res['message'] = "delete error";
+            return json ($res);
+        }
+    }
     private function checkRequestData()
     {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods:post');
         $json = file_get_contents("php://input");
-       // file_put_contents("test.txt", $json);
-    //print_r($json);die();
+        // file_put_contents("test.txt", $json);
+        //print_r($json);die();
         if (empty($json)) {
             $res['success'] = false;
             $res['message'] = 'Empty RequestData';

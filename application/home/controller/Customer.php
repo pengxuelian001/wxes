@@ -39,20 +39,37 @@ class Customer extends Controller
 
     }
     public function select_Customerlist(){
-        $resu=Cache::get('resu');
-        if(empty($resu)){
+//        $type=$_GET['type'];
+//        $typeC=$_GET['typeC'];
+//        $openid=$_GET['openid'];
+            $type=1;
+            $typeC=2;
+            $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+      if($type==1 && $typeC==1){
             $cus_table= new Customers();
-            $resu=$cus_table->CustomerList();
-            Cache::set('resu',$resu,3600);
-            return  json_encode($resu);
-        }else{
+            $resu=$cus_table->CustomerList1($openid);
+          print_R($resu);die();
+              return json ($resu);
+        }elseif($type==1 && $typeC==2){
+          $cus_table= new Customers();
+          $resu=$cus_table->CustomerList3();
+          return json ($resu);
+      }
+      elseif($type==2 && $typeC==2){
+            $cus_table= new Customers();
+            $resu=$cus_table->CustomerList4($openid);
+              return json ($resu);
+        }elseif($type==2 && $typeC==1){
+          $cus_table= new Customers();
+          $resu=$cus_table->CustomerList2($openid);
+          return json ($resu);
+      }
 
-            return  json_encode($resu);
-        }
     }
     public function del_Customer(){
         $read = $this->checkRequestData();
         $id=$read['id'];
+        //$id=1;
         $result=Db::name('customer_info')->where('Id',$id)->delete();
         if($result){
             Cache::rm('resu');
@@ -75,21 +92,23 @@ class Customer extends Controller
         $data['position']=$read['position'];
         $data['followUper']=$read['followUper'];
         $data['schedule']=$read['schedule'];
+        $data['update_time']=date('Y-m-d H:i:s');
         $data['scale']=$read['scale'];
 
         $result=Db::name('customer_info')->where('Id',$id)->find();
         if($result){
             $re=Db::name('customer_info')->where('Id',$id)->update($data);
             if($re){
+                Cache::rm('resu');
                 $res['success'] = true;
                 $res['message'] = "success";
                 return json ($res);
             }
         }else{
-            $res['success'] = false;
-            $res['message'] = " error";
-            return json ($res);
-        }
+
+            }
+
+
 
     }
     private function checkRequestData()

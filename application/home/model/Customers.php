@@ -18,15 +18,164 @@ class Customers extends Model
         $list = DB::table($this->table)->where('status',1)->paginate(5);
         return $list;
     }
-    public function CustomerList(){
-        $res=Db::query("select * from(
-                             select b.whos,b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,a.create_time,a.update_time,b.create_time as records_time
+
+    public function CustomerList1($openid){
+//        $res=Db::query("    select * from(
+//                             select b.whos,b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,date_format(a.create_time,'%Y-%m-%d') as create_time,date_format(a.update_time,'%Y-%m-%d') as update_time,date_format(b.create_time,'%Y-%m-%d') as records_time
+//                             from rl_customer_info as a
+//                             left join rl_customer_records as b on a.id=b.customer_id
+//                              order by b.create_time desc ) as d
+//                              group by d.id
+//                              order by d.create_time desc
+//                    ");
+
+        $res=Db::query("
+                        SELECT DISTINCT
+                            (t2.id),
+                            t2.whos,
+                            t2.detail,
+                            t2.company,
+                            t2.charger,
+                            t2.remark,
+                            t2. SCHEDULE,
+                            t2.scale,
+                            t2.position,
+                            t2.create_time,
+                            t2.update_time
+                        FROM
+                            (
+                                SELECT
+                                    b.whos,
+                                    b.detail,
+                                    a.id AS id,
+                                    a.company,
+                                    a.charger,
+                                    a.remark,
+                                    a. SCHEDULE,
+                                    a.scale,
+                                    a.position,
+                                    date_format(a.create_time, '%Y-%m-%d') AS create_time,
+                                    date_format(a.update_time, '%Y-%m-%d') AS update_time
+                                FROM
+                                    rl_customer_info AS a
+                                LEFT JOIN rl_customer_records AS b ON a.id = b.customer_id
+                                LEFT JOIN rl_user AS c ON a.charger = c.id
+                                WHERE
+                                    c.openid = '$openid'
+                                GROUP BY
+                                    a.id
+                                UNION ALL
+                                    SELECT
+                                        a.whos,
+                                        a.detail,
+                                        c.id AS id,
+                                        c.company,
+                                        c.charger,
+                                        c.remark,
+                                        c. SCHEDULE,
+                                        c.scale,
+                                        c.position,
+                                        date_format(c.create_time, '%Y-%m-%d') AS create_time,
+                                        date_format(c.update_time, '%Y-%m-%d') AS update_time
+                                    FROM
+                                        rl_customer_records AS a
+                                    LEFT JOIN rl_user AS b ON a.user_id = b.openid
+                                    LEFT JOIN rl_customer_info AS c ON a.customer_id = c.id
+                                    WHERE
+                                        b.openid = '$openid'
+                                    GROUP BY
+                                        c.id
+                            ) AS t2
+                        ORDER BY
+                            t2.create_time DESC
+                     ");
+
+        return $res;
+    }
+    public function CustomerList2($openid){
+        $res=Db::query("
+                        SELECT DISTINCT
+                            (t2.id),
+                            t2.whos,
+                            t2.detail,
+                            t2.company,
+                            t2.charger,
+                            t2.remark,
+                            t2. SCHEDULE,
+                            t2.scale,
+                            t2.position,
+                            t2.create_time,
+                            t2.update_time
+                        FROM
+                            (
+                                SELECT
+                                    b.whos,
+                                    b.detail,
+                                    a.id AS id,
+                                    a.company,
+                                    a.charger,
+                                    a.remark,
+                                    a. SCHEDULE,
+                                    a.scale,
+                                    a.position,
+                                    date_format(a.create_time, '%Y-%m-%d') AS create_time,
+                                    date_format(a.update_time, '%Y-%m-%d') AS update_time
+                                FROM
+                                    rl_customer_info AS a
+                                LEFT JOIN rl_customer_records AS b ON a.id = b.customer_id
+                                LEFT JOIN rl_user AS c ON a.charger = c.id
+                                WHERE
+                                    c.openid = '$openid'
+                                GROUP BY
+                                    a.id
+                                UNION ALL
+                                    SELECT
+                                        a.whos,
+                                        a.detail,
+                                        c.id AS id,
+                                        c.company,
+                                        c.charger,
+                                        c.remark,
+                                        c. SCHEDULE,
+                                        c.scale,
+                                        c.position,
+                                        date_format(c.create_time, '%Y-%m-%d') AS create_time,
+                                        date_format(c.update_time, '%Y-%m-%d') AS update_time
+                                    FROM
+                                        rl_customer_records AS a
+                                    LEFT JOIN rl_user AS b ON a.user_id = b.openid
+                                    LEFT JOIN rl_customer_info AS c ON a.customer_id = c.id
+                                    WHERE
+                                        b.openid = '$openid'
+                                    GROUP BY
+                                        c.id
+                            ) AS t2
+                        ORDER BY
+                            t2.update_time DESC
+                     ");
+        return $res;
+
+    }
+    public function CustomerList3()
+    {
+        $res = Db::query(" select * from(
+                             select b.whos,b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,date_format(a.create_time,'%Y-%m-%d') as create_time,date_format(a.update_time,'%Y-%m-%d') as update_time
                              from rl_customer_info as a
                              left join rl_customer_records as b on a.id=b.customer_id
                               order by b.create_time desc ) as d
                               group by d.id
-                              order by d.records_time desc
-                    ");
+                              order by d.create_time desc");
+        return $res;
+    }
+    public function CustomerList4()
+    {
+        $res = Db::query(" select * from(
+                             select b.whos,b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,date_format(a.create_time,'%Y-%m-%d') as create_time,date_format(a.update_time,'%Y-%m-%d') as update_time
+                             from rl_customer_info as a
+                             left join rl_customer_records as b on a.id=b.customer_id
+                              order by b.create_time desc ) as d
+                              group by d.id
+                              order by d.update_time desc");
         return $res;
     }
 }
