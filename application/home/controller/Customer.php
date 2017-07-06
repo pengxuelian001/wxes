@@ -8,7 +8,15 @@ class Customer extends Controller
 {
     public function add_Customer(){
         $read = $this->checkRequestData();
-
+//        $read=array();
+//        $read['charger']="111";
+//        $read['company']="bb";
+//        $read['followUper']="11";
+//        $read['openid']="oCx4a0aan7yxESfMMBKmYMA_8M50";
+//        $read['position']="11";
+//        $read['remark']="11";
+//        $read['scale']="11";
+//        $read['schedule']="11";
         if (is_null($read['scale']) || empty($read['scale'])) {
             $res['success'] = false;
             $res['message'] = "Empty scale";
@@ -26,11 +34,25 @@ class Customer extends Controller
             $res['success'] = false;
             $res['message'] = "Empty followUper";
             return json ($res);
+        }elseif(Db::name('customer_info')->where('company',$read['company'])->find()){
+            $res['success'] = false;
+            $res['message'] = "company  exist ";
+            return json ($res);
         }
-        $Customer =new Customers();
-         $result=$Customer->add_list($read);
+        $data['company']=$read['company'];
+        $data['charger']=$read['charger'];
+        $data['remark']=$read['remark'];
+        $data['position']=$read['position'];
+        $data['followUper']=$read['followUper'];
+        $data['schedule']=$read['schedule'];
+        $data['scale']=$read['scale'];
+        $id=Db::name('customer_info')->insertGetId($data);
+       $arr['customer_id']=$id;
+       $arr['user_id']=$read['openid'];
+       $arr['detail']=$read['company'];
+       $arr['type']=1;
+        $result=Db::name('customer_records')->insert($arr);
         if($result){
-            Cache::rm('resu');
             $res['success'] = true;
             $res['message'] = "success";
             return json ($res);
@@ -39,16 +61,15 @@ class Customer extends Controller
 
     }
     public function select_Customerlist(){
-//        $type=$_GET['type'];
-//        $typeC=$_GET['typeC'];
-//        $openid=$_GET['openid'];
-            $type=1;
-            $typeC=2;
-            $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+        $type=$_GET['type'];
+        $typeC=$_GET['typeC'];
+        $openid=$_GET['openid'];
+//            $type=2;
+//            $typeC=1;
+//            $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
       if($type==1 && $typeC==1){
             $cus_table= new Customers();
             $resu=$cus_table->CustomerList1($openid);
-          print_R($resu);die();
               return json ($resu);
         }elseif($type==1 && $typeC==2){
           $cus_table= new Customers();
@@ -99,7 +120,7 @@ class Customer extends Controller
         if($result){
             $re=Db::name('customer_info')->where('Id',$id)->update($data);
             if($re){
-                Cache::rm('resu');
+               // Cache::rm('resu');
                 $res['success'] = true;
                 $res['message'] = "success";
                 return json ($res);

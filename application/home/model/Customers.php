@@ -32,7 +32,6 @@ class Customers extends Model
         $res=Db::query("
                         SELECT DISTINCT
                             (t2.id),
-                            t2.whos,
                             t2.detail,
                             t2.company,
                             t2.charger,
@@ -45,7 +44,6 @@ class Customers extends Model
                         FROM
                             (
                                 SELECT
-                                    b.whos,
                                     b.detail,
                                     a.id AS id,
                                     a.company,
@@ -66,7 +64,6 @@ class Customers extends Model
                                     a.id
                                 UNION ALL
                                     SELECT
-                                        a.whos,
                                         a.detail,
                                         c.id AS id,
                                         c.company,
@@ -96,7 +93,6 @@ class Customers extends Model
         $res=Db::query("
                         SELECT DISTINCT
                             (t2.id),
-                            t2.whos,
                             t2.detail,
                             t2.company,
                             t2.charger,
@@ -109,7 +105,6 @@ class Customers extends Model
                         FROM
                             (
                                 SELECT
-                                    b.whos,
                                     b.detail,
                                     a.id AS id,
                                     a.company,
@@ -130,7 +125,6 @@ class Customers extends Model
                                     a.id
                                 UNION ALL
                                     SELECT
-                                        a.whos,
                                         a.detail,
                                         c.id AS id,
                                         c.company,
@@ -159,7 +153,7 @@ class Customers extends Model
     public function CustomerList3()
     {
         $res = Db::query(" select * from(
-                             select b.whos,b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,date_format(a.create_time,'%Y-%m-%d') as create_time,date_format(a.update_time,'%Y-%m-%d') as update_time
+                             select b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,date_format(a.create_time,'%Y-%m-%d') as create_time,date_format(a.update_time,'%Y-%m-%d') as update_time
                              from rl_customer_info as a
                              left join rl_customer_records as b on a.id=b.customer_id
                               order by b.create_time desc ) as d
@@ -170,7 +164,7 @@ class Customers extends Model
     public function CustomerList4()
     {
         $res = Db::query(" select * from(
-                             select b.whos,b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,date_format(a.create_time,'%Y-%m-%d') as create_time,date_format(a.update_time,'%Y-%m-%d') as update_time
+                             select b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,date_format(a.create_time,'%Y-%m-%d') as create_time,date_format(a.update_time,'%Y-%m-%d') as update_time
                              from rl_customer_info as a
                              left join rl_customer_records as b on a.id=b.customer_id
                               order by b.create_time desc ) as d

@@ -64,12 +64,12 @@ class Reports extends Controller
 
     }
     public function select_ReportsList(){
-//        $type=3;
-//        $typeC=3;
-//        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
-        $type=$_GET['type'];
-        $typeC=$_GET['typeC'];
-        $openid=$_GET['openid'];
+        $type=3;
+        $typeC=4;
+        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+//        $type=$_GET['type'];
+//        $typeC=$_GET['typeC'];
+//        $openid=$_GET['openid'];
         if($type==1 && $typeC==1){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist11($openid);
@@ -98,7 +98,6 @@ class Reports extends Controller
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist23($openid);
             return json ($value3);
-
         }elseif($type==2 && $typeC==4){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist24($openid);
@@ -120,8 +119,6 @@ class Reports extends Controller
             $value3=$rep_table->selectRepostlist34($openid);
             return json ($value3);
         }
-
-
     }
     public function Create_text(){
         $arr= $this->request->param();
