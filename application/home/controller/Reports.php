@@ -8,23 +8,53 @@ class Reports extends Controller
 {
     public function add_Reports(){
         $read = $this->checkRequestData();
+        $recive=$read['recive'];
+        $copy=array();
+        $reci=array();
+        if(is_null($read['imgList']) || empty($read['imgList'])){
+            foreach($recive as $k=>$vv){
+                $types=$recive[$k]['type'];
+                if($types==1){
+                    $copy[]=$recive[$k]['id'];
+                }elseif($types==2){
+                    $reci[]=$recive[$k]['id'];
+                }
+            }
+            $data['openid']=$read['openid'];
+            $data['title']=$read['title'];
+            $data['copy']=implode(',',$copy);
+            $data['recipients']=implode(',',$reci);
+            $data['position']=$read['position'];
+            $data['content']=$read['content'];
+            $reciveData['reportId']=Db::name('reports')->insertGetId($data);
+            for($j=0;$j<count($recive);$j++){
+                $reciveData["reciveId"]=$recive[$j]['id'];
+                $reciveData["type"]=$recive[$j]['type'];
+                $resl= Db::name('reports_readed')->insertGetId($reciveData);
+            }
+            if($resl){
+                $res['success'] = true;
+                $res['message'] = "success";
+                return json ($res);
+            }
+        }
+
         $img=$read['imgList'];
         foreach($img as $v){
            $da[]=$v;
         }
-        $recive=$read['recive'];
         foreach($recive as $k=>$vv){
-            $types=$recive[$k]['type'];
+             $types=$recive[$k]['type'];
             if($types==2){
-                $name[]=$recive[$k]['name'];
+                $copy[]=$recive[$k]['id'];
             }elseif($types==1){
-                $reci[]=$recive[$k]['name'];
+                $reci[]=$recive[$k]['id'];
             }
         }
-         $arr=implode(',',$da);
+        $arr=implode(',',$da);
         $data['openid']=$read['openid'];
         $data['title']=$read['title'];
-        $data['copy']=implode(',',$name);
+        $data['copy']=implode(',',$copy);
         $data['recipients']=implode(',',$reci);
         $data['imgList']=$arr;
         $data['position']=$read['position'];
@@ -64,12 +94,12 @@ class Reports extends Controller
 
     }
     public function select_ReportsList(){
-        $type=3;
-        $typeC=4;
-        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
-//        $type=$_GET['type'];
-//        $typeC=$_GET['typeC'];
-//        $openid=$_GET['openid'];
+//        $type=1;
+//        $typeC=3;
+//        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+        $type=$_GET['type'];
+        $typeC=$_GET['typeC'];
+        $openid=$_GET['openid'];
         if($type==1 && $typeC==1){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist11($openid);

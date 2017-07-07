@@ -21,6 +21,16 @@ class Users extends Model
         $list= Db::query("SELECT id ,name FROM rl_department GROUP BY id");
         return $list;
     }
+    public  function  get_value($openid){
+      //  $list = DB::table($this->table)->where('openid',$openid)->select("usergroup,company_id");
+        $list=Db::query("select nickName,avatarUrl,company_id,usergroup from rl_user WHERE openid='$openid'");
+        return $list;
+    }
+    public  function  get_name($openid){
+        //  $list = DB::table($this->table)->where('openid',$openid)->select("usergroup,company_id");
+        $list=Db::query("select a.nickName,a.avatarUrl,b.name as company_name from rl_user as a  left join rl_company as b on a.company_id=b.id WHERE openid='$openid'");
+        return $list;
+    }
 }
         
        

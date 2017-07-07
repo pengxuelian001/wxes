@@ -43,13 +43,68 @@ class User extends Controller
 
        }
     }
-    public function Group_Reports(){
-        $user_table= new Users();
-        $result=$user_table->Group_Report();
-        foreach($result as $k=>$v){
-            $group_id=$result[$k]['id'];
-            $result[$k]['data']= Db::query("SELECT * FROM rl_user where UserGroup='$group_id'");
+    public function arraya(){
+//        $sites = array
+//        (
+//            "runoob"=>array
+//            (
+//                "菜鸟教程",
+//                "http://www.runoob.com"
+//            ),
+//            "google"=>array
+//            (
+//                "Google 搜索",
+//                "http://www.google.com"
+//            ),
+//            "taobao"=>array
+//            (
+//                "淘宝",
+//                "http://www.taobao.com"
+//            )
+//        );
+        $read=Array
+        (
+            "userInfo" => Array
+            (
+                "nickName" => "拉多布拉",
+            "gender" => 1,
+            "language" => "zh_CN",
+            "city" => "Nanchang",
+            "province" => "Jiangxi",
+            "country" =>"CN" ,
+            "avatarUr" => "http://wx.qlogo.cn/mmopen0"
+        ),
+    "userInfo_openid" => Array
+        (
+            "session_key"=> "v1U+K7lv+4ByPI+wzudOMA==",
+        "expires_in" => 7200,
+            "openid" => "oCx4a0aan7yxESfMMBKmYMA_8M50"
+        )
+
+    );
+
+       //$read = $this->checkRequestData();
+        foreach($read as $k=>$v){
+            foreach($v as $kk=>$v){
+                $data[$kk]=$v;
+            }
         }
+        echo '<pre>';
+        print_R($data);
+       die();
+    }
+    public function Group_Reports(){
+        $openid="oCx4a0aan7yxESfMMBKmYMA_8M50";
+        //$openid=$_GET['openid'];
+        $user_table= new Users();
+        $user=$user_table->get_value($openid);
+        $company_id=$user[0]['company_id'];
+        $result=$user_table->Group_Report();
+       foreach($result as $k=>$v){
+           $group_id=$result[$k]['id'];
+            $result[$k]['data']= Db::query("SELECT * FROM rl_user where company_id='$company_id'and usergroup='$group_id'");
+        }
+
         return json ($result);
     }
 
@@ -160,6 +215,7 @@ class User extends Controller
             return json ($res,'json');
         }
         $read = json_decode($json,true);
+
         if (is_null($read)) {
             $res['success'] = false;
             $res['message'] = "json_decode_error";
