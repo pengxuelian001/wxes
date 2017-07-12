@@ -12,27 +12,26 @@ class User extends Controller
     public function add_Users(){
         $read = $this->checkRequestData();
         $openid=$read["userInfo_openid"]["openid"];
-
-
        foreach($read as $userInfo => $oneObj) {
             foreach ($oneObj as $key => $value) {
                 $data[$key] = $value;
             }
         }
-        $re=Db::name('user')->where('openid',$openid)->select();
-
+        $userTbale=new Users();
+        $re=$userTbale->select_tableByopenid($openid);
        if($re){
            $count=$re[0]['count'];
            $arr['count']=$count+1;
-           $result=Db::name('user')->where("openid='$openid'")->update($arr);
+           $result=$userTbale->updata_user($openid,$arr);
            if($result!=null){
+               Cache::rm('users');
                $res['success'] = true;
                $res['message'] = "update success";
                return json ($res);
            }
 
         }else{
-           $result=Db::name('user')->insert($data);
+           $result=$userTbale->add_list($data);
            if($result){
                Cache::rm('users');
                $res['success'] = true;
@@ -43,75 +42,26 @@ class User extends Controller
 
        }
     }
-    public function arraya(){
-//        $sites = array
-//        (
-//            "runoob"=>array
-//            (
-//                "菜鸟教程",
-//                "http://www.runoob.com"
-//            ),
-//            "google"=>array
-//            (
-//                "Google 搜索",
-//                "http://www.google.com"
-//            ),
-//            "taobao"=>array
-//            (
-//                "淘宝",
-//                "http://www.taobao.com"
-//            )
-//        );
-        $read=Array
-        (
-            "userInfo" => Array
-            (
-                "nickName" => "拉多布拉",
-            "gender" => 1,
-            "language" => "zh_CN",
-            "city" => "Nanchang",
-            "province" => "Jiangxi",
-            "country" =>"CN" ,
-            "avatarUr" => "http://wx.qlogo.cn/mmopen0"
-        ),
-    "userInfo_openid" => Array
-        (
-            "session_key"=> "v1U+K7lv+4ByPI+wzudOMA==",
-        "expires_in" => 7200,
-            "openid" => "oCx4a0aan7yxESfMMBKmYMA_8M50"
-        )
 
-    );
-
-       //$read = $this->checkRequestData();
-        foreach($read as $k=>$v){
-            foreach($v as $kk=>$v){
-                $data[$kk]=$v;
-            }
-        }
-        echo '<pre>';
-        print_R($data);
-       die();
-    }
     public function Group_Reports(){
-        $openid="oCx4a0aan7yxESfMMBKmYMA_8M50";
-        //$openid=$_GET['openid'];
+        $openid=$_GET['openid'];
         $user_table= new Users();
         $user=$user_table->get_value($openid);
         $company_id=$user[0]['company_id'];
         $result=$user_table->Group_Report();
+
        foreach($result as $k=>$v){
            $group_id=$result[$k]['id'];
-            $result[$k]['data']= Db::query("SELECT * FROM rl_user where company_id='$company_id'and usergroup='$group_id'");
+           $result[$k]['data']=$user_table->getReportList($company_id,$group_id);
         }
-
         return json ($result);
     }
 
     public function select_UsersList(){
         $user=Cache::get('users');
         if(empty($user)){
-            $value1=Db::name('user')->select();
+            $user_table= new Users();
+            $value1=$user_table->select_List();
             Cache::set('users',$value1,3600);
             return  json_encode($value1);
         }else{
@@ -119,9 +69,10 @@ class User extends Controller
         }
     }
     public  function del_Users(){
-        $read = $this->checkRequestData();
+         $read = $this->checkRequestData();
         $openid=$read['openid'];
-        $result=Db::name('user')->where('openid',$openid)->delete();
+        $user_table= new Users();
+        $result=$user_table->delelte_user($openid);
         if($result){
             Cache::rm('users');
             $res['success'] = true;
@@ -135,12 +86,9 @@ class User extends Controller
     }
     public function upload(){
         $file = request()->file('file');
-        print_R($file);die();
         $info = $file->validate(['size'=>15678,'ext'=>'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads');
-
-        $filename = $file -> getInfo()['name'];
         if($info){
-            //$prj=$this->set_Excel($info);
+            $prj=$this->set_Excel($info);
         }else{
 
             echo $file->getError();
@@ -223,6 +171,39 @@ class User extends Controller
         }
 
         return $read;
+    }
+    public function arraya(){
+
+        $read=Array
+        (
+            "userInfo" => Array
+            (
+                "nickName" => "拉多布拉",
+                "gender" => 1,
+                "language" => "zh_CN",
+                "city" => "Nanchang",
+                "province" => "Jiangxi",
+                "country" =>"CN" ,
+                "avatarUr" => "http://wx.qlogo.cn/mmopen0"
+            ),
+            "userInfo_openid" => Array
+            (
+                "session_key"=> "v1U+K7lv+4ByPI+wzudOMA==",
+                "expires_in" => 7200,
+                "openid" => "oCx4a0aan7yxESfMMBKmYMA_8M50"
+            )
+
+        );
+
+        //$read = $this->checkRequestData();
+        foreach($read as $k=>$v){
+            foreach($v as $kk=>$v){
+                $data[$kk]=$v;
+            }
+        }
+        echo '<pre>';
+        print_R($data);
+        die();
     }
 
     public function arr(){

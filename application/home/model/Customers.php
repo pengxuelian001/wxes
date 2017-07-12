@@ -10,25 +10,15 @@ class Customers extends Model
         return $list;
     }
     public  function add_list($oneObj){
-       // print_r($oneObj);die();
-        $list = DB::table($this->table)->insert($oneObj);
+        $list = DB::table($this->table)->insertGetId($oneObj);
         return $list;
     }
-    public function page(){
-        $list = DB::table($this->table)->where('status',1)->paginate(5);
+    public function slectBycompany($company_id){
+        $list = DB::table($this->table)->where('company=:company')->bind(['company'=>"$company_id"])->select();
         return $list;
     }
 
     public function CustomerList1($openid){
-//        $res=Db::query("    select * from(
-//                             select b.whos,b.detail,a.id as id,a.company,a.charger,a.remark,a.position,a.followUper,a.schedule,a.scale,date_format(a.create_time,'%Y-%m-%d') as create_time,date_format(a.update_time,'%Y-%m-%d') as update_time,date_format(b.create_time,'%Y-%m-%d') as records_time
-//                             from rl_customer_info as a
-//                             left join rl_customer_records as b on a.id=b.customer_id
-//                              order by b.create_time desc ) as d
-//                              group by d.id
-//                              order by d.create_time desc
-//                    ");
-
         $res=Db::query("
                         SELECT DISTINCT
                             (t2.id),
@@ -58,8 +48,7 @@ class Customers extends Model
                                     rl_customer_info AS a
                                 LEFT JOIN rl_customer_records AS b ON a.id = b.customer_id
                                 LEFT JOIN rl_user AS c ON a.charger = c.id
-                                WHERE
-                                    c.openid = '$openid'
+                                WHERE c.openid='$openid'
                                 GROUP BY
                                     a.id
                                 UNION ALL
@@ -78,8 +67,7 @@ class Customers extends Model
                                         rl_customer_records AS a
                                     LEFT JOIN rl_user AS b ON a.user_id = b.openid
                                     LEFT JOIN rl_customer_info AS c ON a.customer_id = c.id
-                                    WHERE
-                                        b.openid = '$openid'
+                                    WHERE  b.openid='$openid'
                                     GROUP BY
                                         c.id
                             ) AS t2
@@ -119,8 +107,7 @@ class Customers extends Model
                                     rl_customer_info AS a
                                 LEFT JOIN rl_customer_records AS b ON a.id = b.customer_id
                                 LEFT JOIN rl_user AS c ON a.charger = c.id
-                                WHERE
-                                    c.openid = '$openid'
+                                WHERE c.openid='$openid'
                                 GROUP BY
                                     a.id
                                 UNION ALL
@@ -139,8 +126,7 @@ class Customers extends Model
                                         rl_customer_records AS a
                                     LEFT JOIN rl_user AS b ON a.user_id = b.openid
                                     LEFT JOIN rl_customer_info AS c ON a.customer_id = c.id
-                                    WHERE
-                                        b.openid = '$openid'
+                                    WHERE  b.openid='$openid'
                                     GROUP BY
                                         c.id
                             ) AS t2
