@@ -43,14 +43,16 @@ class Users extends Model
 
         return $list;
     }
-    public  function  get_name($openid){
-        $list= Db::table('rl_user')
-            ->alias('a')
-            ->join('rl_company b','a.company_id=b.id')
-            ->where("openid=:openid")->bind(['openid'=>"$openid"])
-            ->field(' a.openid,a.nickName,a.avatarUrl,b.name as company_name')
-            ->select();
-        //$list=Db::query("select a.openid,a.nickName,a.avatarUrl,b.name as company_name from rl_user as a  left join rl_company as b on a.company_id=b.id WHERE openid='$openid'");
+    public  function  get_name($oid){
+//        $list= Db::table('rl_user')
+//            ->alias('a')
+//            ->join('rl_company b','a.company_id=b.id')
+//            ->where("openid=:openid")->bind(['openid'=>"$openid"])
+//            ->field(' a.openid,a.nickName,a.avatarUrl,b.name as company_name')
+//            ->select();
+//        $list=Db::query("select a.openid,a.nickName,a.avatarUrl,b.name as company_name from rl_user as a
+//                left join rl_company as b on a.company_id=b.id WHERE openid='$oid'");
+        $list=Db::query("select a.openid,a.nickName,a.avatarUrl from rl_user as a WHERE openid='$oid'");
         return $list;
     }
 }

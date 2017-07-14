@@ -67,12 +67,12 @@ class Customer extends Controller
 
     }
     public function select_Customerlist(){
-//        $type=$_GET['type'];
-//        $typeC=$_GET['typeC'];
-//        $openid=$_GET['openid'];
-            $type=1;
-            $typeC=2;
-        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+        $type=$_GET['type'];
+        $typeC=$_GET['typeC'];
+        $openid=$_GET['openid'];
+//            $type=1;
+//            $typeC=2;
+//        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
 
       if($type==1 && $typeC==1){
             $cus_table= new Customers();

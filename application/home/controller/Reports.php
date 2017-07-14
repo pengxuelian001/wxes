@@ -94,15 +94,15 @@ class Reports extends Controller
 
     }
     public function select_ReportsList(){
-        $type=2;
-        $typeC=4;
-        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
-//        $type=$_GET['type'];
-//        $typeC=$_GET['typeC'];
-//        $openid=$_GET['openid'];
+//        $type=3;
+//        $typeC=4;
+//        $openid='oCx4a0WQTanq9VK9uvPw6xwGF9Vk';
+        $type=$_GET['type'];
+        $typeC=$_GET['typeC'];
+        $openid=$_GET['openid'];
         if($type==1 && $typeC==1){
             $rep_table=new report();
-            $value3=$rep_table->selectRepostlist11($openid);
+          $value3=$rep_table->selectRepostlist11($openid);
             return json ($value3);
         }elseif($type==1 && $typeC==2){
             $rep_table=new report();
