@@ -22,10 +22,16 @@ class Task extends Controller
             $res['message'] = "Empty recipients";
             return json ($res);
         }
-        $read['create_time']=date("Y-m-d");
-        $result=Db::name('task')->insert($read);
+        $data['customer_id']=$read['customer_id'];
+        $data['create_time']=$read['date'];
+        $data['depict']=$read['depict'];
+        $data['importance']=$read['importance'];
+        $data['openid']=$read['openid'];
+        $data['participants']=$read['participants'];
+        $data['principal']=$read['principal'];
+        $data['theme']=$read['theme'];
+        $result=Db::name('task')->insert($data);
         if($result){
-           // Cache::rm($where);
             $res['success'] = true;
             $res['message'] = "success";
             return json ($res);
@@ -94,21 +100,38 @@ class Task extends Controller
         $tpye=$read['type'];
         $delayTime=$read['delayTime'];
         $openid=$read['openId'];
+//        $id=5;
+//        $tpye=1;
         if($tpye==1){
-            $data['update_time']=$delayTime;
-            $data['done']=1;
-            $result=Db::name('task')->where('Id',$id)->update($data);
-            if($result){
-              //  Cache::rm($where);
-                $res['success'] = true;
-                $res['message'] = "update success";
-                return json ($res);
-            }else{
+            $result=Db::name('task')->where('Id',$id)->field('done')->select();
+            $done=$result[0]['done'];
+            if($done==1){
+               $result=Db::name('task')->where('id',$id)->setField('done',0);
+                if($result){
+                    $res['success'] = true;
+                    $res['message'] = "update success";
+                    return json ($res);
+                }else{
 
-                $res['success'] = false;
-                $res['message'] = "update error";
-                return json ($res);
+                    $res['success'] = false;
+                    $res['message'] = "update error";
+                    return json ($res);
+                }
+            }elseif($done==0){
+                $result=Db::name('task')->where('id',$id)->setField('done',1);
+                if($result){
+
+                    $res['success'] = true;
+                    $res['message'] = "update success";
+                    return json ($res);
+                }else{
+
+                    $res['success'] = false;
+                    $res['message'] = "update error";
+                    return json ($res);
+                }
             }
+
         }elseif($tpye==3){
             $result=Db::name('task')->where('Id',$id)->delete();
             if($result){

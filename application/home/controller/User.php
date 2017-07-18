@@ -55,6 +55,7 @@ class User extends Controller
            $result[$k]['data']=$user_table->getReportList($company_id,$group_id);
         }
         return json ($result);
+
     }
 
     public function select_UsersList(){
@@ -69,10 +70,39 @@ class User extends Controller
         }
     }
     public  function del_Users(){
-         $read = $this->checkRequestData();
-        $openid=$read['openid'];
+         //$read = $this->checkRequestData();
+       // $openid=$read['openid'];
+        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+        $user=Db::name('user')->where("openid='$openid'")->field('id')->select();
+        $id=$user[0]['id'];
+        $arr=Db::query("SELECT recipients FROM rl_reports  WHERE recipients  LIKE '%$id%'");
+        $a=Db::query("SELECT recipients FROM rl_reports  WHERE recipients  LIKE '%$id%'");
+        foreach($arr as $k=>$v){
+            $recipients=explode(',',$arr[$k]['recipients']);
+            $names ='';
+            foreach($recipients as $kk=>$vv){
+                if($vv==$id){
+                   $vv='';
+                }
+                if($vv){
+                    $names=$names .$vv;
+                }
+
+            }
+            $arr[$k]['recipients']=$names;
+
+
+        }
+
+        echo '<pre>';
+        print_R($arr);
+
+
+        die();
         $user_table= new Users();
         $result=$user_table->delelte_user($openid);
+
+
         if($result){
             Cache::rm('users');
             $res['success'] = true;

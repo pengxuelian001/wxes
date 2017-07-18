@@ -15,9 +15,9 @@ class Reports extends Controller
             foreach($recive as $k=>$vv){
                 $types=$recive[$k]['type'];
                 if($types==1){
-                    $copy[]=$recive[$k]['id'];
-                }elseif($types==2){
                     $reci[]=$recive[$k]['id'];
+                }elseif($types==2){
+                    $copy[]=$recive[$k]['id'];
                 }
             }
             $data['openid']=$read['openid'];
@@ -38,7 +38,6 @@ class Reports extends Controller
                 return json ($res);
             }
         }
-
         $img=$read['imgList'];
         foreach($img as $v){
            $da[]=$v;
@@ -74,13 +73,26 @@ class Reports extends Controller
 
     }
     public  function upload(){
-        $arr= $this->request->param();
-        $openid=$arr['openid'];
-        $file = request()->file('file');
+        //$arr= $this->request->param();
+       // $openid=$arr['openid'];
+       //$file = request()->file('file');
+//        $file=array('info:protected'=>array('name'=>'sdfdf','type'=>'images/111.jpg'),'aabb:123'=>array('id'=>1,'name'=>'14212'));
+//        foreach($file as $k=>$v){
+//            $a=$v;
+//            $content = iconv("GBK", "UTF-8", $a);
+//           // $content = mb_convert_encoding($content, "UTF-8","GBK");
+//            echo '<pre>';
+//            print_R($content);
+//        }
+//
+//        die();
+        //echo '<pre>';
+      //  print_R($file['info:protected']);die();
         $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads'. DS ."$openid",'');
         if($info){
             $exclePath = $info->getSaveName();  //获取文件名
             $filename = ROOT_PATH . 'public' . DS . 'uploads' . DS . $exclePath;
+
             return json ($filename);
         }
     }
@@ -94,56 +106,68 @@ class Reports extends Controller
 
     }
     public function select_ReportsList(){
-//        $type=3;
-//        $typeC=4;
-//        $openid='oCx4a0WQTanq9VK9uvPw6xwGF9Vk';
+//        $type=1;
+//        $typeC=1;
+//        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
         $type=$_GET['type'];
         $typeC=$_GET['typeC'];
         $openid=$_GET['openid'];
+    //    发给我的按create_time倒序排序
         if($type==1 && $typeC==1){
             $rep_table=new report();
           $value3=$rep_table->selectRepostlist11($openid);
             return json ($value3);
+            //发给我的按update_time倒序排序
         }elseif($type==1 && $typeC==2){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist12($openid);
             return json ($value3);
+            //发给我的,一周以内的按update_time倒序排序
         }elseif($type==1 && $typeC==3){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist13($openid);
             return json ($value3);
+            //发给我的,本月以内的按update_time倒序排序
         }elseif($type==1 && $typeC==4){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist14($openid);
             return json ($value3);
+            //我发出去的按create_time倒序排序
         }elseif($type==2 && $typeC==1){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist21($openid);
             return json ($value3);
+            //我发出去的按 update_time倒序排序
         }elseif($type==2 && $typeC==2){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist22($openid);
             return json ($value3);
+            //我发出去的,一周以内的，按 update_time倒序排序
         }elseif($type==2 && $typeC==3 ){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist23($openid);
             return json ($value3);
+            //我发出去的,本月以内的，按 update_time倒序排序
         }elseif($type==2 && $typeC==4){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist24($openid);
             return json ($value3);
+            //全部，按 create_time倒序排序
         }elseif($type==3 && $typeC==1){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist31($openid);
             return json ($value3);
+            //全部，按 update_time倒序排序
         }elseif($type==3 && $typeC==2){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist32($openid);
             return json ($value3);
+            //全部，一周以内的，按 update_time倒序排序
         }elseif($type==3 && $typeC==3){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist33($openid);
             return json ($value3);
+            //全部，本月以内的，按 update_time倒序排序
         }elseif($type==3 && $typeC==4){
             $rep_table=new report();
             $value3=$rep_table->selectRepostlist34($openid);

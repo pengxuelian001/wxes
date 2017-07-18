@@ -71,9 +71,8 @@ class Customer extends Controller
         $typeC=$_GET['typeC'];
         $openid=$_GET['openid'];
 //            $type=1;
-//            $typeC=2;
+//            $typeC=1;
 //        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
-
       if($type==1 && $typeC==1){
             $cus_table= new Customers();
             $resu=$cus_table->CustomerList1($openid);
