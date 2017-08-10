@@ -69,32 +69,20 @@ class Reports extends Controller
             $res['message'] = "success";
             return json ($res);
         }
-
-
     }
     public  function upload(){
-        //$arr= $this->request->param();
-       // $openid=$arr['openid'];
-       //$file = request()->file('file');
-//        $file=array('info:protected'=>array('name'=>'sdfdf','type'=>'images/111.jpg'),'aabb:123'=>array('id'=>1,'name'=>'14212'));
-//        foreach($file as $k=>$v){
-//            $a=$v;
-//            $content = iconv("GBK", "UTF-8", $a);
-//           // $content = mb_convert_encoding($content, "UTF-8","GBK");
-//            echo '<pre>';
-//            print_R($content);
-//        }
-//
-//        die();
-        //echo '<pre>';
-      //  print_R($file['info:protected']);die();
-        $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads'. DS ."$openid",'');
+        $arr= $this->request->param();
+        $openid=$arr['openid'];
+        $filepath=$arr['filePath'];
+        $file = request()->file('file');
+        $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads'. DS ."$openid",substr($filepath,9));
         if($info){
-            $exclePath = $info->getSaveName();  //获取文件名
-            $filename = ROOT_PATH . 'public' . DS . 'uploads' . DS . $exclePath;
+            $filename = ROOT_PATH . 'public' . DS . 'uploads' . DS . $filepath;
 
             return json ($filename);
         }
+
+
     }
     public function age(){
         $data['username']='pp';

@@ -122,14 +122,28 @@ class Customer extends Controller
         $data['update_time']=date('Y-m-d H:i:s');
         $data['scale']=$read['scale'];
 
-        $result=Db::name('customer_info')->where('Id',$id)->find();
-        if($result){
-            $re=Db::name('customer_info')->where('Id',$id)->update($data);
-            if($re){
-                $res['success'] = true;
-                $res['message'] = "success";
-                return json ($res);
-            }
+//        $result=Db::name('customer_info')->where('Id',$id)->find();
+//        if($result){
+//            $re=Db::name('customer_info')->where('Id',$id)->update($data);
+//            if($re){
+//                $res['success'] = true;
+//                $res['message'] = "success";
+//                return json ($res);
+//            }
+//        }
+
+        Db::startTrans();
+        try{
+
+            $result=Db::name('customer_info')->where('Id',$id)->find();
+
+            $result=Db::name('customer_info')->where('Id',$id)->update($data);
+            Db::commit();
+
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            echo '有错误';
         }
     }
     private function checkRequestData()

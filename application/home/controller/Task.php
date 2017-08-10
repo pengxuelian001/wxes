@@ -13,7 +13,12 @@ class Task extends Controller
             $res['message'] = "Empty principal";
             return json ($res);
 
-        }elseif(is_null($read['customer_id']) || empty($read['customer_id'])){
+        }elseif(is_null($read['theme']) || empty($read['theme'])){
+            $res['success'] = false;
+            $res['message'] = "Empty theme";
+            return json ($res);
+        }
+        elseif(is_null($read['customer_id']) || empty($read['customer_id'])){
             $res['success'] = false;
             $res['message'] = "Empty customer_id";
             return json ($res);
@@ -39,13 +44,33 @@ class Task extends Controller
 
 
     }
+    public function getHttp(){
+        $js_code= $_GET['js_code'];
+        $url="https://api.weixin.qq.com/sns/jscode2session?appid=wx84f945286d5ad907&secret=df9fe3ebc39d0b4bd30335110bafe393&grant_type=authorization_code&js_code=".$js_code;
+        $return = $this->curl_get($url);
+        return json ($return);
+    }
+    public function curl_get($url = "") {
+        if (!$url) {
+            return false;
+        } $ch = curl_init();
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE); //设定为不验证证书和host
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+
+        $output = json_decode(curl_exec($ch));
+        curl_close($ch);
+        return $output;
+    }
     public function select_TaskList(){
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods:get');
        $openid=$_GET['open_id'];
        $start_time=$_GET['start_time'];
-        //$openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
-       // $start_time='2017-06-07';
+       // $openid='olonw0Cb5KgE32C3Y8OW2Ir8YQ0w';
+       //$start_time='2017-08-09';
         $str='%Y-%m-%d';
         $ye=  explode('-', $start_time)[0];
         $me=  explode('-', $start_time)[1];
@@ -73,12 +98,9 @@ class Task extends Controller
             else{
                 $result[$d-1]['success']=false;
                 $result[$d-1]['create_time']=$ye.'-'.$me.'-'.$d;
-
             }
-
         }
-
-        return  json_encode($result);
+       return  json_encode($result);
     }
     public function getTask(){
         $day=date("Y-m-d");

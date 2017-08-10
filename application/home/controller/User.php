@@ -6,6 +6,7 @@ use app\home\model\Users;
 use think\Db;
 use think\Cache;
 use think\Loader;
+use think\Request;
 
 class User extends Controller
 {
@@ -70,9 +71,8 @@ class User extends Controller
         }
     }
     public  function del_Users(){
-         //$read = $this->checkRequestData();
-       // $openid=$read['openid'];
-        $openid='oCx4a0aan7yxESfMMBKmYMA_8M50';
+         $read = $this->checkRequestData();
+        $openid=$read['openid'];
         $user=Db::name('user')->where("openid='$openid'")->field('id')->select();
         $id=$user[0]['id'];
         $arr=Db::query("SELECT recipients FROM rl_reports  WHERE recipients  LIKE '%$id%'");
@@ -94,11 +94,6 @@ class User extends Controller
 
         }
 
-        echo '<pre>';
-        print_R($arr);
-
-
-        die();
         $user_table= new Users();
         $result=$user_table->delelte_user($openid);
 
